@@ -891,6 +891,11 @@ connect_async_ai(struct smb2_context *smb2, const struct addrinfo *ai, int *fd_o
 
         set_nonblocking(fd);
         set_tcp_sockopt(fd, TCP_NODELAY, 1);
+#if defined(__PS4__)
+        int size = 1048576;
+        setsockopt(fd, SOL_SOCKET, SO_SNDBUF, &size, sizeof(size));
+        setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &size, sizeof(size));
+#endif
 
         if (connect(fd, (struct sockaddr *)&ss, socksize) != 0
 #ifndef _MSC_VER

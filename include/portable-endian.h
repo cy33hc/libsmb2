@@ -97,7 +97,7 @@
 
 #	include <sys/endian.h>
 
-#elif defined(PS4_PLATFORM)
+#elif defined(__PS4__)
 
 #	include <endian.h>
 
