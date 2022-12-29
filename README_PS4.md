@@ -5,6 +5,7 @@
 2. Run following cmds
    pacbrew-pacman -Sy
    pacbrew-pacman -S ps4-openorbis ps4-openorbis-portlibs
+   git checkout ps4
    chmod guo+x /opt/pacbrew/ps4/openorbis/ps4vars.sh
    source /opt/pacbrew/ps4/openorbis/ps4vars.sh
    mkdir build; cd build
