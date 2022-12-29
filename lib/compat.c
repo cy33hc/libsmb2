@@ -162,6 +162,13 @@ int iop_connect(int sockfd, struct sockaddr *addr, socklen_t addrlen)
 
 #endif /* PS2_IOP_PLATFORM */
 
+#ifdef __vita__
+
+#define NEED_READV
+#define NEED_WRITEV
+
+#endif
+
 #ifdef PS3_PPU_PLATFORM
 
 #define NEED_READV

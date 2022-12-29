@@ -44,7 +44,8 @@ set(SOURCES aes.c
             sync.c
             timestamps.c
             unicode.c
-	    usha.c)
+	    usha.c
+	    compat.c)
 
 add_library(smb2 ${SOURCES})
 target_link_libraries(smb2 PUBLIC ${core_DEPENDS} ${CORE_LIBRARIES})

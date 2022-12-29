@@ -147,6 +147,19 @@ ssize_t readv(int fd, const struct iovec *iov, int iovcnt);
 
 #endif /* PS4_PLATFORM */
 
+#ifdef __vita__
+#include <errno.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+
+#define getlogin_r(a,b) ENXIO
+#define SOL_TCP IPPROTO_TCP
+
+ssize_t writev(int fd, const struct iovec *iov, int iovcnt);
+ssize_t readv(int fd, const struct iovec *iov, int iovcnt);
+
+#endif
+
 #ifdef PS3_PPU_PLATFORM
 
 #include <errno.h>
