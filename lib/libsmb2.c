@@ -61,7 +61,7 @@
 #include <fcntl.h>
 #endif
 
-#if !defined(PS2_EE_PLATFORM) && !defined(PS2_IOP_PLATFORM)
+#if !defined(PS2_EE_PLATFORM) && !defined(PS2_IOP_PLATFORM) && !defined(PICO_PLATFORM)
 #include <sys/socket.h>
 #endif
 
@@ -108,6 +108,10 @@ static const char SMB2APP[] = "SMB2APP";
 static const char SmbRpc[] = "SmbRpc";
 static const char SMBAppKey[] = "SMBAppKey";
 */
+
+#ifndef O_ACCMODE
+#define O_ACCMODE (O_RDWR|O_WRONLY|O_RDONLY)
+#endif // !O_ACCMODE
 
 #ifndef O_SYNC
 #ifndef O_DSYNC
@@ -413,7 +417,7 @@ query_cb(struct smb2_context *smb2, int status,
                 return;
         }
 
-        smb2_set_error(smb2, "Query directory failed with (0x%08x) %s. %s",
+        smb2_set_nterror(smb2, status, "Query directory failed with (0x%08x) %s. %s",
                        status, nterror_to_str(status),
                        smb2_get_error(smb2));
         dir->cb(smb2, -nterror_to_errno(status), NULL, dir->cb_data);
@@ -430,7 +434,7 @@ opendir_cb(struct smb2_context *smb2, int status,
         struct smb2_pdu *pdu;
 
         if (status != SMB2_STATUS_SUCCESS) {
-                smb2_set_error(smb2, "Opendir failed with (0x%08x) %s.",
+                smb2_set_nterror(smb2, status, "Opendir failed with (0x%08x) %s.",
                                status, nterror_to_str(status));
                 dir->cb(smb2, -nterror_to_errno(status), NULL, dir->cb_data);
                 free_smb2dir(smb2, dir);
@@ -533,7 +537,7 @@ tree_connect_cb(struct smb2_context *smb2, int status,
 
         if (status != SMB2_STATUS_SUCCESS) {
                 smb2_close_context(smb2);
-                smb2_set_error(smb2, "Tree Connect failed with (0x%08x) %s. %s",
+                smb2_set_nterror(smb2, status, "Tree Connect failed with (0x%08x) %s. %s",
                                status, nterror_to_str(status),
                                smb2_get_error(smb2));
                 c_data->cb(smb2, -nterror_to_errno(status), NULL, c_data->cb_data);
@@ -624,7 +628,7 @@ session_setup_cb(struct smb2_context *smb2, int status,
 
         } else if (status != SMB2_STATUS_SUCCESS) {
                 smb2_close_context(smb2);
-                smb2_set_error(smb2, "Session setup failed with (0x%08x) %s",
+                smb2_set_nterror(smb2, status, "Session setup failed with (0x%08x) %s",
                                status, nterror_to_str(status));
                 c_data->cb(smb2, -nterror_to_errno(status), NULL,
                            c_data->cb_data);
@@ -838,7 +842,7 @@ negotiate_cb(struct smb2_context *smb2, int status,
 
         if (status != SMB2_STATUS_SUCCESS) {
                 smb2_close_context(smb2);
-                smb2_set_error(smb2, "Negotiate failed with (0x%08x) %s. %s",
+                smb2_set_nterror(smb2, status, "Negotiate failed with (0x%08x) %s. %s",
                                status, nterror_to_str(status),
                                smb2_get_error(smb2));
                 c_data->cb(smb2, -nterror_to_errno(status), NULL,
@@ -1101,7 +1105,7 @@ open_cb(struct smb2_context *smb2, int status,
         struct smb2_create_reply *rep = command_data;
 
         if (status != SMB2_STATUS_SUCCESS) {
-                smb2_set_error(smb2, "Open failed with (0x%08x) %s.",
+                smb2_set_nterror(smb2, status, "Open failed with (0x%08x) %s.",
                                status, nterror_to_str(status));
                 fh->cb(smb2, -nterror_to_errno(status), NULL, fh->cb_data);
                 free_smb2fh(smb2, fh);
@@ -1157,15 +1161,19 @@ smb2_open_async(struct smb2_context *smb2, const char *path, int flags,
         }
 
         /* desired access */
-        if (flags & (O_RDWR | O_WRONLY)) {
-                desired_access |= SMB2_FILE_WRITE_DATA |
-                        SMB2_FILE_WRITE_EA |
-                        SMB2_FILE_WRITE_ATTRIBUTES;
-        }
-        if (!(flags & O_WRONLY)) {
-                desired_access |= SMB2_FILE_READ_DATA |
-                        SMB2_FILE_READ_EA |
-                        SMB2_FILE_READ_ATTRIBUTES;
+        switch (flags & O_ACCMODE) {
+                case O_RDWR:
+                case O_WRONLY:
+                        desired_access |= SMB2_FILE_WRITE_DATA |
+                                SMB2_FILE_WRITE_EA |
+                                SMB2_FILE_WRITE_ATTRIBUTES;
+                        if ((flags & O_ACCMODE) == O_WRONLY)
+                                break;
+                case O_RDONLY:
+                        desired_access |= SMB2_FILE_READ_DATA |
+                                SMB2_FILE_READ_EA |
+                                SMB2_FILE_READ_ATTRIBUTES;
+                        break;
         }
 
         /* create options */
@@ -1205,7 +1213,7 @@ close_cb(struct smb2_context *smb2, int status,
         struct smb2fh *fh = private_data;
 
         if (status != SMB2_STATUS_SUCCESS) {
-                smb2_set_error(smb2, "Close failed with (0x%08x) %s",
+                smb2_set_nterror(smb2, status, "Close failed with (0x%08x) %s",
                                status, nterror_to_str(status));
                 fh->cb(smb2, -nterror_to_errno(status), NULL, fh->cb_data);
                 free_smb2fh(smb2, fh);
@@ -1255,7 +1263,7 @@ fsync_cb(struct smb2_context *smb2, int status,
         struct smb2fh *fh = private_data;
 
         if (status != SMB2_STATUS_SUCCESS) {
-                smb2_set_error(smb2, "Flush failed with (0x%08x) %s",
+                smb2_set_nterror(smb2, status, "Flush failed with (0x%08x) %s",
                                status, nterror_to_str(status));
                 fh->cb(smb2, -nterror_to_errno(status), NULL, fh->cb_data);
                 return;
@@ -1310,7 +1318,7 @@ read_cb(struct smb2_context *smb2, int status,
         struct smb2_read_reply *rep = command_data;
 
         if (status && status != SMB2_STATUS_END_OF_FILE) {
-                smb2_set_error(smb2, "Read/Write failed with (0x%08x) %s",
+                smb2_set_nterror(smb2, status, "Read/Write failed with (0x%08x) %s",
                                status, nterror_to_str(status));
                 rd->cb(smb2, -nterror_to_errno(status), &rd->read_cb_data, rd->cb_data);
                 free(rd);
@@ -1429,7 +1437,7 @@ write_cb(struct smb2_context *smb2, int status,
         struct smb2_write_reply *rep = command_data;
 
         if (status && status != SMB2_STATUS_END_OF_FILE) {
-                smb2_set_error(smb2, "Read/Write failed with (0x%08x) %s",
+                smb2_set_nterror(smb2, status, "Read/Write failed with (0x%08x) %s",
                                status, nterror_to_str(status));
                 wd->cb(smb2, -nterror_to_errno(status), &wd->write_cb_data, wd->cb_data);
                 free(wd);
@@ -2410,7 +2418,7 @@ readlink_cb_1(struct smb2_context *smb2, int status,
         struct readlink_cb_data *cb_data = private_data;
 
         if (status != SMB2_STATUS_SUCCESS) {
-                smb2_set_error(smb2, "%s", nterror_to_str(status));
+                smb2_set_nterror(smb2, status, "%s", nterror_to_str(status));
         }
         cb_data->status = status;
 }

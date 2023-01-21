@@ -23,7 +23,7 @@
 #include "config.h"
 #endif
 
-#if defined(PS2_EE_PLATFORM) || defined(PS3_PPU_PLATFORM) || defined(ESP_PLATFORM) || defined(__APPLE__) || defined(PS4_PLATFORM) || defined(__PS4__)
+#if defined(PS2_EE_PLATFORM) || defined(PS3_PPU_PLATFORM) || defined(ESP_PLATFORM) || defined(PICO_PLATFORM) || defined(__APPLE__) || defined(PS4_PLATFORM) || defined(__PS4__)
 /* We need this for time_t */
 #include <time.h>
 #endif
@@ -213,6 +213,7 @@ struct smb2_context {
         uint16_t dialect;
 
         char error_string[MAX_ERROR_SIZE];
+        int nterror;
 
         /* Open filehandles */
         struct smb2fh *fhs;
@@ -292,6 +293,8 @@ uint64_t timeval_to_win(struct smb2_timeval *tv);
 
 void smb2_set_error(struct smb2_context *smb2, const char *error_string,
                     ...);
+void smb2_set_nterror(struct smb2_context *smb2, int nterror,
+                    const char *error_string, ...);
 
 void smb2_close_connecting_fds(struct smb2_context *smb2);
 
