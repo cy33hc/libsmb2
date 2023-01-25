@@ -23,7 +23,7 @@
 #include "config.h"
 #endif
 
-#if defined(PS2_EE_PLATFORM) || defined(PS3_PPU_PLATFORM) || defined(ESP_PLATFORM) || defined(PICO_PLATFORM) || defined(__APPLE__) || defined(PS4_PLATFORM)
+#if defined(PS2_EE_PLATFORM) || defined(PS3_PPU_PLATFORM) || defined(ESP_PLATFORM) || defined(PICO_PLATFORM) || defined(__APPLE__) || defined(PS4_PLATFORM) || defined(__SWITCH__)
 /* We need this for time_t */
 #include <time.h>
 #endif
@@ -278,13 +278,22 @@ struct utf16 {
 /* Returns a string converted to UTF-16 format. Use free() to release
  * the utf16 string.
  */
+#ifdef __SWITCH__
+#define utf8_to_utf16(x) smb2_utf8_to_utf16(x)
+struct utf16 *smb2_utf8_to_utf16(const char *utf8);
+#else
 struct utf16 *utf8_to_utf16(const char *utf8);
-        
+#endif
+
 /* Returns a string converted to UTF8 format. Use free() to release
  * the utf8 string.
  */
+#ifdef __SWITCH__
+#define utf16_to_utf8(x, y) smb2_utf16_to_utf8(x, y)
+const char *smb2_utf16_to_utf8(const uint16_t *str, int len);
+#else
 const char *utf16_to_utf8(const uint16_t *str, int len);
-
+#endif
 /* Convert a win timestamp to a unix timeval */
 void win_to_timeval(uint64_t smb2_time, struct smb2_timeval *tv);
 

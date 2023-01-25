@@ -37,14 +37,15 @@ set(SOURCES aes.c
             smb2-data-filesystem-info.c
             smb2-data-security-descriptor.c
             smb2-data-reparse-point.c
-	    smb2-share-enum.c
-	    smb3-seal.c
-	    smb2-signing.c
+            smb2-share-enum.c
+            smb3-seal.c
+            smb2-signing.c
             socket.c
             sync.c
             timestamps.c
             unicode.c
-	    usha.c)
+            usha.c
+            compat.c)
 
 add_library(smb2 ${SOURCES})
 target_link_libraries(smb2 PUBLIC ${core_DEPENDS} ${CORE_LIBRARIES})

@@ -156,7 +156,11 @@ validate_utf8_str(const char *utf8)
 
 /* Convert a UTF8 string into UTF-16LE */
 struct utf16 *
+#ifdef __SWITCH__
+smb2_utf8_to_utf16(const char *utf8)
+#else
 utf8_to_utf16(const char *utf8)
+#endif
 {
         struct utf16 *utf16;
         int i, len;
@@ -237,7 +241,11 @@ utf16_size(const uint16_t *utf16, int utf16_len)
  * Convert a UTF-16LE string into UTF8
  */
 const char *
+#ifdef __SWITCH__
+smb2_utf16_to_utf8(const uint16_t *utf16, int utf16_len)
+#else
 utf16_to_utf8(const uint16_t *utf16, int utf16_len)
+#endif
 {
         int utf8_len = 1;
         char *str, *tmp;

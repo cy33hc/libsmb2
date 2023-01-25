@@ -120,6 +120,24 @@
 
 #	include <endian.h>
 
+#elif defined(__SWITCH__)
+
+#	include <machine/endian.h>
+#   define htobe16(x) __bswap16(x)
+#   define htole16(x) (x)
+#   define be16toh(x) __bswap16(x)
+#   define le16toh(x) (x)
+
+#   define htobe32(x) __bswap32(x)
+#   define htole32(x) (x)
+#   define be32toh(x) __bswap32(x)
+#   define le32toh(x) (x)
+
+#   define htobe64(x) __bswap64(x)
+#   define htole64(x) (x)
+#   define be64toh(x) __bswap64(x)
+#   define le64toh(x) (x)
+
 #elif defined(__NetBSD__) || defined(__FreeBSD__) || defined(__DragonFly__)
 
 #	include <sys/endian.h>

@@ -158,6 +158,14 @@ ssize_t readv(int fd, const struct iovec *iov, int iovcnt);
 
 #endif /* PS4_PLATFORM */
 
+#ifdef __SWITCH__
+#include <sys/errno.h>
+#include <sys/socket.h>
+#define getlogin_r(a,b) ENXIO
+ssize_t writev(int fd, const struct iovec *iov, int iovcnt);
+ssize_t readv(int fd, const struct iovec *iov, int iovcnt);
+#endif /* __SWITCH__ */
+
 #ifdef PS3_PPU_PLATFORM
 
 #include <errno.h>
