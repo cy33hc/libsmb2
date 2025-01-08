@@ -174,6 +174,13 @@ int iop_connect(int sockfd, struct sockaddr *addr, socklen_t addrlen)
 #endif /* PS2_IOP_PLATFORM */
 
 #ifdef __SWITCH__
+#include <errno.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <alloca.h>
+#include <stdio.h>
+#include <switch/types.h>
 #include <sys/socket.h>
 #define NEED_READV
 #define NEED_WRITEV
