@@ -19,11 +19,13 @@
 #ifndef _LIBSMB2_PRIVATE_H_
 #define _LIBSMB2_PRIVATE_H_
 
+#define PS5 1
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#if defined(PS2_EE_PLATFORM) || defined(PS3_PPU_PLATFORM) || defined(ESP_PLATFORM) || defined(PICO_PLATFORM) || defined(__APPLE__) || defined(PS4_PLATFORM) || defined(__PS4__)
+#if defined(PS2_EE_PLATFORM) || defined(PS3_PPU_PLATFORM) || defined(ESP_PLATFORM) || defined(PICO_PLATFORM) || defined(__APPLE__) || defined(PS4_PLATFORM) || defined(__PS4__) || defined(PS5)
 /* We need this for time_t */
 #include <time.h>
 #endif

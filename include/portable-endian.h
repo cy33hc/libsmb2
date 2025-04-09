@@ -7,6 +7,8 @@
 #ifndef PORTABLE_ENDIAN_H__
 #define PORTABLE_ENDIAN_H__
 
+#define PS5 1
+
 #if (defined(_WIN16) || defined(_WIN32) || defined(_WIN64)) && !defined(__WINDOWS__)
 
 #	define __WINDOWS__
@@ -120,6 +122,8 @@
 
 #	include <endian.h>
 
+#elif defined(PS5)
+#       include <sys/endian.h>
 #elif defined(__NetBSD__) || defined(__FreeBSD__) || defined(__DragonFly__)
 
 #	include <sys/endian.h>

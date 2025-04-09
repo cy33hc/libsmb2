@@ -22,9 +22,7 @@
 
 #include <errno.h>
 
-#if defined(__PS4__)
 #define ENODATA 98
-#endif
 
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
