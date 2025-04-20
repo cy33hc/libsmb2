@@ -58,7 +58,7 @@
 
 #elif defined(__linux__) || defined(__CYGWIN__) || defined(ESP_PLATFORM) || defined(__NetBSD__) || defined(__FreeBSD__) || defined(__DragonFly__) || defined(__OpenBSD__)
 
-#if defined(__linux__) || defined(__CYGWIN__) || defined(PS4_PLATFORM) || defined(ESP_PLATFORM)
+#if defined(__linux__) || defined(__CYGWIN__) || defined(PS4_PLATFORM) || defined(ESP_PLATFORM) || defined(__PS4__)
 #include <endian.h>
 /* Include byteswap.h on linux since it might not be automatically included in some cases (e.g. alpine / musl) */
 #if defined(__linux__)
@@ -68,6 +68,7 @@
 #include <sys/endian.h>
 #endif
 
+#if !defined(__PS4__)
 /* These 4 #defines may be needed with older esp-idf environments */
 #ifndef _LITTLE_ENDIAN
 #define _LITTLE_ENDIAN LITTLE_ENDIAN
@@ -107,6 +108,8 @@
 
 #ifndef le64toh 
 #define le64toh(x) letoh64(x)
+#endif
+
 #endif
 
 #elif defined(__APPLE__)
