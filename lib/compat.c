@@ -226,6 +226,9 @@ int iop_connect(int sockfd, struct sockaddr *addr, socklen_t addrlen)
 #endif
 #if defined(__SWITCH__)
 #include <switch/types.h>
+#define NEED_READV
+#define NEED_WRITEV
+#define NEED_GETLOGIN_R
 #elif defined(__3DS__)
 #include <3ds/types.h>	
 #elif defined(__WII__) || defined(__GC__)

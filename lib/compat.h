@@ -539,6 +539,14 @@ ssize_t readv(t_socket fd, const struct iovec *iov, int iovcnt);
 
 #endif /* __PS2__ */
 
+#ifdef __SWITCH__
+#include <sys/errno.h>
+#include <sys/socket.h>
+int getlogin_r(char *buf, size_t size);
+ssize_t writev(int fd, const struct iovec *iov, int iovcnt);
+ssize_t readv(int fd, const struct iovec *iov, int iovcnt);
+#endif /* __SWITCH__ */
+
 #ifdef PS3_PPU_PLATFORM
 
 #include <sys/time.h>
